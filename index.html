@@ -3,6 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "ymaq2fepfk");
+</script>
 <title>Mariia Mostova — Product Designer</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Fraunces:opsz,wght@9..144,500&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
@@ -1090,6 +1097,17 @@
     view.appendChild(footNav);
   }
 
+  // ---------- analytics (Microsoft Clarity) ----------
+  // Clarity only auto-tracks the initial page load; this site is a single
+  // HTML file with hash-based client-side routing, so every "page" (case)
+  // switch is reported manually as a custom tag + event. Safe no-op if
+  // Clarity isn't loaded (e.g. on the Claude Artifact preview copy).
+  function trackView(pageId){
+    if (typeof window.clarity !== "function") return;
+    window.clarity("set", "page", pageId);
+    window.clarity("event", "view_" + pageId);
+  }
+
   function openCase(id){
     var c = byId[id];
     if (!c) return;
@@ -1098,6 +1116,7 @@
     document.getElementById("view-case").hidden = false;
     window.scrollTo({top:0, behavior:"instant"});
     history.replaceState(null, "", "#case-"+id);
+    trackView("case-" + id);
   }
 
   function closeCase(){
@@ -1105,6 +1124,7 @@
     document.getElementById("view-home").hidden = false;
     history.replaceState(null, "", "#cases");
     document.getElementById("cases").scrollIntoView({block:"start"});
+    trackView("home");
   }
 
   document.getElementById("brand-link").addEventListener("click", function(ev){
@@ -1119,8 +1139,9 @@
     var h = location.hash || "";
     if (h.indexOf("#case-") === 0){
       var id = h.replace("#case-","");
-      if (byId[id]) openCase(id);
+      if (byId[id]){ openCase(id); return true; }
     }
+    return false;
   }
 
   // ---------- picture lightbox ----------
@@ -1149,7 +1170,7 @@
   });
 
   renderCaseList();
-  routeFromHash();
+  if (!routeFromHash()) trackView("home");
   window.addEventListener("hashchange", routeFromHash);
 
   var themeBtn = document.getElementById("theme-toggle");
