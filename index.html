@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" sizes="16x16" href="assets/logo/mm2-favicon-16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="assets/logo/mm2-favicon-32.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/logo/mm2-favicon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/logo/mm2-favicon-180.png">
 <script type="text/javascript">
     (function(c,l,a,r,i,t,y){
         c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
@@ -112,6 +116,10 @@
   .topbar .name{
     font-family:'Fraunces', serif;font-size:18px;font-weight:500;
     text-decoration:none;white-space:nowrap;
+    display:flex;align-items:center;gap:9px;
+  }
+  .topbar .name img{
+    width:28px;height:28px;border-radius:8px;display:block;flex:none;
   }
   .topbar nav{display:flex;gap:24px;align-items:center;}
   .topbar nav a{white-space:nowrap;}
@@ -322,7 +330,6 @@
 
   .img-loading{position:relative;display:block;min-height:100%;}
   figure .img-loading{min-height:120px;}
-  .phone-frame .img-loading{min-height:262px;}
   .case-thumb .img-loading{height:100%;}
   .img-loading img{opacity:0;transition:opacity .35s ease;}
   .img-loading img.img-loaded{opacity:1;}
@@ -348,20 +355,25 @@
 
   .phone-row{
     display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
-    gap:20px;margin-top:20px;align-items:start;
+    gap:20px;margin-top:20px;align-items:start;justify-items:center;
   }
   .phone-frame{
     display:block;border:9px solid var(--ink);border-radius:30px;overflow:hidden;
-    background:#000;box-shadow:var(--shadow);max-width:260px;margin-inline:auto;
-    position:relative;min-height:280px;
+    background:#000;box-shadow:var(--shadow);margin-inline:auto;
+    position:relative;
+    aspect-ratio:9/19.5;height:min(75vh,560px);max-width:92vw;width:auto;
   }
   :root[data-theme="dark"] .phone-frame{border-color:#45301d;}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .phone-frame{border-color:#45301d;}}
-  .phone-frame img{width:100%;display:block;}
+  .phone-frame .img-loading{position:absolute;inset:0;min-height:0;}
+  .phone-frame img{width:100%;height:100%;object-fit:cover;display:block;}
   .phone-row figcaption{text-align:center;}
 
-  .video-frame{width:340px;max-width:100%;margin-inline:auto;}
-  .video-frame video{width:100%;display:block;border-radius:28px;border:6px solid var(--ink);aspect-ratio:9/19.5;object-fit:cover;background:#000;}
+  .video-frame{
+    width:auto;max-width:92vw;margin-inline:auto;
+    aspect-ratio:9/19.5;height:min(75vh,560px);position:relative;
+  }
+  .video-frame video{width:100%;height:100%;display:block;border-radius:28px;border:6px solid var(--ink);background:#000;object-fit:cover;}
   :root[data-theme="dark"] .video-frame video{border-color:#45301d;}
   @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .video-frame video{border-color:#45301d;}}
   .video-caption{text-align:center;margin-top:14px;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--text-secondary);}
@@ -499,7 +511,7 @@
 
 <div id="app">
   <header class="topbar">
-    <a class="name" href="#home" id="brand-link">Mariia Mostova</a>
+    <a class="name" href="#home" id="brand-link"><img src="assets/logo/mm2-favicon-180.png" alt="" width="28" height="28">Mariia Mostova</a>
     <nav>
       <a href="#cases">Cases</a>
       <a href="#contacts">Contacts</a>
@@ -1122,8 +1134,6 @@
   function closeCase(){
     document.getElementById("view-case").hidden = true;
     document.getElementById("view-home").hidden = false;
-    history.replaceState(null, "", "#cases");
-    document.getElementById("cases").scrollIntoView({block:"start"});
     trackView("home");
   }
 
@@ -1131,8 +1141,25 @@
     if (!document.getElementById("view-case").hidden){
       ev.preventDefault();
       closeCase();
+      history.replaceState(null, "", "#home");
       window.scrollTo({top:0, behavior:"instant"});
     }
+  });
+
+  // "Cases" / "Contacts" links in the top nav point at sections inside the
+  // home view. If a case page is open, that view is hidden, so a plain
+  // anchor click landed nowhere visible. Close the case first, then jump
+  // to the right section.
+  document.querySelectorAll(".topbar nav a[href^='#']").forEach(function(link){
+    link.addEventListener("click", function(ev){
+      if (document.getElementById("view-case").hidden) return;
+      ev.preventDefault();
+      var targetId = link.getAttribute("href").slice(1);
+      closeCase();
+      history.replaceState(null, "", "#" + targetId);
+      var target = document.getElementById(targetId);
+      if (target) target.scrollIntoView({block:"start"});
+    });
   });
 
   function routeFromHash(){
