@@ -133,10 +133,25 @@
   }
   .topbar nav a:hover{color:var(--text);border-color:var(--border-strong);}
   .theme-toggle{
-    border:1px solid var(--border);background:var(--bg-elevated);color:var(--text);
-    width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:14px;
-    display:flex;align-items:center;justify-content:center;
+    --sun:#e8590c;--moon:#f6e8d8;
+    position:relative;display:inline-flex;align-items:center;
+    width:62px;height:32px;padding:3px;border-radius:100px;cursor:pointer;
+    border:1px solid var(--border);background:var(--bg-sunken);
   }
+  .theme-toggle .knob{
+    position:absolute;top:3px;left:3px;width:26px;height:24px;border-radius:100px;
+    background:var(--bg-elevated);box-shadow:0 1px 3px rgba(43,26,16,0.18);
+    transition:transform .22s ease, background-color .22s ease;
+  }
+  .theme-toggle .ti{
+    position:relative;z-index:1;flex:1;display:flex;align-items:center;justify-content:center;
+    color:var(--text-secondary);transition:color .22s ease, opacity .22s ease;opacity:.7;
+  }
+  .theme-toggle .ti svg{width:16px;height:16px;display:block;}
+  .theme-toggle[aria-checked="false"] .ti-sun{color:var(--sun);opacity:1;}
+  .theme-toggle[aria-checked="true"] .knob{transform:translateX(28px);background:#4a3020;}
+  .theme-toggle[aria-checked="true"] .ti-moon{color:var(--moon);opacity:1;}
+  @media (prefers-reduced-motion: reduce){.theme-toggle .knob,.theme-toggle .ti{transition:none;}}
   .theme-toggle:focus-visible, a:focus-visible, button:focus-visible{
     outline:2px solid var(--accent);outline-offset:2px;
   }
@@ -531,7 +546,7 @@
     <nav>
       <a href="#cases">Cases</a>
       <a href="#contacts">Contacts</a>
-      <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Toggle color theme">◐</button>
+      <button class="theme-toggle" id="theme-toggle" type="button" role="switch" aria-checked="false" aria-label="Dark mode"><span class="knob" aria-hidden="true"></span><span class="ti ti-sun" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="4.2" fill="currentColor"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M5.3 18.7l1.6-1.6M17.1 6.9l1.6-1.6"/></svg></span><span class="ti ti-moon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.5 14.6A8.6 8.6 0 0 1 9.4 3.5a.6.6 0 0 0-.8-.7A9.5 9.5 0 1 0 21.2 15.4a.6.6 0 0 0-.7-.8z"/></svg></span></button>
     </nav>
   </header>
 
@@ -1240,18 +1255,20 @@
   function currentTheme(){
     return document.documentElement.getAttribute("data-theme");
   }
-  function applyThemeIcon(){
+  var darkQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+  function isDark(){
     var t = currentTheme();
-    themeBtn.textContent = t === "dark" ? "●" : t === "light" ? "○" : "◐";
+    if (t) return t === "dark";
+    return !!(darkQuery && darkQuery.matches);
+  }
+  function applyThemeIcon(){
+    themeBtn.setAttribute("aria-checked", isDark() ? "true" : "false");
   }
   themeBtn.addEventListener("click", function(){
-    var t = currentTheme();
-    var order = [null, "dark", "light"];
-    var next = order[(order.indexOf(t === null ? null : t) + 1) % order.length];
-    if (next) document.documentElement.setAttribute("data-theme", next);
-    else document.documentElement.removeAttribute("data-theme");
+    document.documentElement.setAttribute("data-theme", isDark() ? "light" : "dark");
     applyThemeIcon();
   });
+  if (darkQuery && darkQuery.addEventListener) darkQuery.addEventListener("change", applyThemeIcon);
   applyThemeIcon();
 })();
 </script>
