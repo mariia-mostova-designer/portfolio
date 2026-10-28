@@ -906,7 +906,7 @@
   .shelf{width:fit-content;margin-inline:auto;padding:0 22px;}
   .spine-title{white-space:normal;text-wrap:balance;text-overflow:clip;text-align:center;}
   .spine-book.sb4{--h:262px;}
-  @media (max-width:760px){.shelf{padding:0 14px;gap:4px;} .shelf .spine-book{--w:48px;} .spine-book.sb5{transform:rotate(-5deg);} .spine-book.sb5:hover{transform:rotate(-5deg);}}
+  @media (max-width:760px){.shelf{padding:0 14px;gap:4px;} .shelf .spine-book{--w:48px;} .spine-book.sb5{transform:rotate(-5deg);} .spine-book.sb5:hover,.spine-book.sb5:focus-visible{transform:rotate(-5deg) translateY(-14px);}}
 
   /* ---------- per-case chips ---------- */
   .case-tags{order:1;margin:2px 0 0;gap:8px;}
@@ -1285,6 +1285,7 @@
   .intro-cover .ic-logo{position:absolute;top:28px;left:32px;width:40px;border-radius:10px;box-shadow:0 4px 12px -4px rgba(0,0,0,.4);}
   .intro-cover .ic-name{white-space:nowrap;font-size:clamp(28px,3.4vw,46px);}
   @media (max-width:760px){ .intro-cover .ic-logo{top:22px;left:22px;width:34px;} .intro-cover .ic-name{font-size:32px;} }
+  @media (max-width:760px){ .hero-photo{justify-self:start;margin-inline:0;} }
 </style>
 </head>
 <body>
